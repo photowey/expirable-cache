@@ -1,0 +1,8 @@
+description = "expirable-cache-spring-boot-autoconfigurer"
+
+dependencies {
+    compile project(":expirable-cache-spring-boot")
+
+    compile 'org.springframework.boot:spring-boot-configuration-processor'
+    compile 'org.springframework.boot:spring-boot-autoconfigure'
+}

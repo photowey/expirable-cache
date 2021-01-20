@@ -1,0 +1,22 @@
+pluginManagement {
+    plugins {
+        id "org.springframework.boot.bom" version "2.4.1"
+    }
+    resolutionStrategy {
+    }
+    repositories {
+        mavenLocal()
+        maven {
+            name "aliyun";
+            url "https://maven.aliyun.com/repository/public"
+        }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = 'expirable-cache'
+
+include 'expirable-cache-spring-boot'
+include 'expirable-cache-spring-boot-autoconfigurer'
+include 'expirable-cache-spring-boot-starter'

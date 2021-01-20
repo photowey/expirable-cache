@@ -1,0 +1,107 @@
+// ================================================================= PLUGINS
+buildscript {
+    ext {
+        SPRING_BOOT_VERSION = "2.4.1"
+    }
+    repositories {
+        mavenLocal()
+        maven {
+            name "aliyun";
+            url "https://maven.aliyun.com/repository/public"
+        }
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${SPRING_BOOT_VERSION}")
+    }
+}
+
+plugins {
+    id "org.springframework.boot" version "2.4.1"
+    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'java'
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: "org.springframework.boot"
+    apply plugin: "io.spring.dependency-management"
+
+    dependencyManagement {
+        imports {
+            mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+        }
+    }
+
+    dependencies {
+        compile "org.springframework.boot:spring-boot-starter"
+        // Test
+        testCompile "org.springframework.boot:spring-boot-starter-test"
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+}
+
+group = 'com.photowey'
+version = '1.0.0-SNAPSHOT'
+
+description = "expirable-cache"
+defaultTasks 'build'
+
+// ================================================================= ALL_PROJECTS
+
+allprojects {
+    // Apply declare versions
+    apply from: "${project.rootDir}/versions.gradle"
+
+    group 'com.photowey'
+    version '1.0.0-SNAPSHOT'
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    jar {
+        // for multi module
+        enabled(true)
+    }
+
+    repositories {
+        mavenLocal()
+        maven {
+            name "aliyun";
+            url "https://maven.aliyun.com/repository/public"
+        }
+        mavenCentral()
+    }
+
+    buildscript {
+        repositories {
+            mavenLocal()
+            maven {
+                name "aliyun";
+                url 'https://maven.aliyun.com/repository/public'
+            }
+            mavenCentral()
+        }
+    }
+
+    springBoot {
+        buildInfo()
+    }
+
+    tasks.withType(AbstractCompile).each { it.options.encoding = "${DEFAULT_ENCODING}" }
+
+    tasks.withType(Javadoc) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.addStringOption('encoding', "${DEFAULT_ENCODING}")
+        options.addStringOption('charSet', "${DEFAULT_ENCODING}")
+    }
+
+    configurations.all {
+        resolutionStrategy.cacheChangingModulesFor 0, "minutes"
+    }
+}
