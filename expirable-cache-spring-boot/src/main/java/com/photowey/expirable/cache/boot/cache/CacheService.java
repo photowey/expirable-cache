@@ -1,5 +1,7 @@
 package com.photowey.expirable.cache.boot.cache;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * {@code CacheService}
  *
@@ -13,4 +15,7 @@ public interface CacheService {
 
     <K, V> V put(K k, V v);
 
+    <K, V> void put(K key, V value, long expire);
+
+    <K, V> void put(K key, V value, long expire, TimeUnit timeUnit);
 }
