@@ -1,9 +1,29 @@
+/*
+ * Copyright © 2020-2021 photowey (photowey@gmail.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.photowey.expirable.cache.autoconfigurer.selector;
 
+import com.photowey.expirable.cache.boot.cache.local.LocalCacheService;
 import org.springframework.context.annotation.ImportSelector;
+import org.springframework.core.io.support.SpringFactoriesLoader;
 import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
-import java.util.function.Predicate;
+import java.util.List;
 
 /**
  * {@code ExpirableCacheAutoConfigurerImportSelector}
@@ -15,12 +35,10 @@ import java.util.function.Predicate;
 public class ExpirableCacheAutoConfigurerImportSelector implements ImportSelector {
 
     @Override
-    public Predicate<String> getExclusionFilter() {
-        return null;
-    }
-
-    @Override
     public String[] selectImports(AnnotationMetadata annotationMetadata) {
-        return new String[0];
+        // SPI
+        List<String> localCacheClassNames = SpringFactoriesLoader.loadFactoryNames(
+                LocalCacheService.class, ClassUtils.getDefaultClassLoader());
+        return StringUtils.toStringArray(localCacheClassNames);
     }
 }
