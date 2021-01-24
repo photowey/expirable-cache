@@ -26,9 +26,15 @@ import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.redisson.config.SingleServerConfig;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -36,6 +42,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.util.ObjectUtils;
 
 /**
  * {@code ExpirableCacheRedisAutoConfiguration}
@@ -46,8 +53,26 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  */
 @Configuration
 @ConditionalOnClass(RedisConnectionFactory.class)
+@EnableConfigurationProperties({ExpirableCacheProperties.class})
 @AutoConfigureAfter(org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration.class)
-public class ExpirableCacheRedisAutoConfiguration {
+public class ExpirableCacheRedisAutoConfiguration implements BeanFactoryAware, InitializingBean {
+
+    private BeanFactory beanFactory;
+
+    @Override
+    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+        this.beanFactory = beanFactory;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        RedisProperties redisProperties = this.beanFactory.getBean(RedisProperties.class);
+        ExpirableCacheProperties expirableCacheProperties = this.beanFactory.getBean(ExpirableCacheProperties.class);
+        ExpirableCacheProperties.Redis redis = expirableCacheProperties.getRedis();
+        redis.setHost(ObjectUtils.isEmpty(redis.getHost()) ? redisProperties.getHost() : redis.getHost());
+        redis.setPort(ObjectUtils.isEmpty(redis.getPort()) ? redisProperties.getPort() : redis.getPort());
+        redis.setPassword(ObjectUtils.isEmpty(redis.getPassword()) ? redisProperties.getPassword() : redis.getPassword());
+    }
 
     /**
      * {@link RedisCacheService}
@@ -83,12 +108,12 @@ public class ExpirableCacheRedisAutoConfiguration {
     /**
      * Create {@link RedissonClient} instance if necessary.
      *
-     * @param expirableCacheProperties {@link ExpirableCacheProperties}
      * @return {@link RedissonClient}
      */
     @Bean
     @ConditionalOnMissingBean
-    public RedissonClient redissonClient(ExpirableCacheProperties expirableCacheProperties) {
+    public RedissonClient redissonClient() {
+        ExpirableCacheProperties expirableCacheProperties = this.beanFactory.getBean(ExpirableCacheProperties.class);
         String addressTemplate = "redis://%s:%d";
         ExpirableCacheProperties.Redis redis = expirableCacheProperties.getRedis();
         Config config = new Config();

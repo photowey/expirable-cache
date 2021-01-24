@@ -22,10 +22,13 @@ import com.photowey.expirable.cache.boot.aop.creator.ExpirableCacheProxyCreator;
 import com.photowey.expirable.cache.boot.aop.matcher.AopConditionalMatcher;
 import com.photowey.expirable.cache.boot.parser.IExpressionParser;
 import com.photowey.expirable.cache.boot.parser.impl.ExpressionParserImpl;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Role;
+import org.springframework.core.Ordered;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
@@ -37,7 +40,6 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
  * @since 1.0.0
  */
 @Configuration
-@Conditional(value = AopConditionalMatcher.class)
 public class ExpirableCacheAopAutoConfiguration {
 
     @Bean
@@ -52,16 +54,23 @@ public class ExpirableCacheAopAutoConfiguration {
     }
 
     @Bean
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public ExpirableCacheAdvice expirableCacheAdvice() {
         return new ExpirableCacheAdvice(this.expirableCacheExpressionParser());
     }
 
     @Bean
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public ExpirableCacheAdvisor expirableCacheAdvisor() {
-        return new ExpirableCacheAdvisor();
+        ExpirableCacheAdvisor expirableCacheAdvisor = new ExpirableCacheAdvisor();
+        expirableCacheAdvisor.setAdvice(this.expirableCacheAdvice());
+        expirableCacheAdvisor.setOrder(Ordered.LOWEST_PRECEDENCE - 10);
+
+        return expirableCacheAdvisor;
     }
 
     @Bean
+    @Conditional(value = AopConditionalMatcher.class)
     public ExpirableCacheProxyCreator expirableCacheProxyCreator() {
         ExpirableCacheProxyCreator expirableCacheProxyCreator = new ExpirableCacheProxyCreator();
         expirableCacheProxyCreator.setPointcutAdvisor(this.expirableCacheAdvisor());

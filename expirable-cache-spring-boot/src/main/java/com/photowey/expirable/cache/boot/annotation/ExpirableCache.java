@@ -42,6 +42,9 @@ public @interface ExpirableCache {
     @AliasFor("value")
     String[] name() default {};
 
+    @AliasFor("name")
+    String[] cacheCandidate() default {};
+
     long expire() default 60L;
 
     TimeUnit timeUnit() default TimeUnit.SECONDS;

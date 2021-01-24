@@ -18,13 +18,12 @@ package com.photowey.expirable.cache.autoconfigurer.config;
 
 import com.photowey.expirable.cache.autoconfigurer.config.local.ExpirableCacheLocalAutoConfiguration;
 import com.photowey.expirable.cache.autoconfigurer.config.redis.ExpirableCacheRedisAutoConfiguration;
+import com.photowey.expirable.cache.autoconfigurer.selector.ExpirableCacheAutoConfigurerImportSelector;
 import com.photowey.expirable.cache.boot.cache.CacheManager;
 import com.photowey.expirable.cache.boot.cache.DefaultCacheManager;
 import com.photowey.expirable.cache.boot.lock.DefaultLockManager;
 import com.photowey.expirable.cache.boot.lock.LockManager;
-import com.photowey.expirable.cache.boot.properties.ExpirableCacheProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -38,11 +37,11 @@ import org.springframework.context.annotation.Import;
  */
 @Configuration
 @Import(value = {
+        ExpirableCacheAutoConfigurerImportSelector.class,
         ExpirableCacheAopAutoConfiguration.class,
         ExpirableCacheRedisAutoConfiguration.class,
         ExpirableCacheLocalAutoConfiguration.class
 })
-@EnableConfigurationProperties({ExpirableCacheProperties.class})
 public class ExpirableCacheAutoConfiguration {
 
     /**

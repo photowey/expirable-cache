@@ -1,2 +1,6 @@
+# EnableAutoConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.photowey.expirable.cache.autoconfigurer.config.ExpirableCacheAutoConfiguration
+
 # LocalCacheService
 com.photowey.expirable.cache.boot.cache.local.LocalCacheService=\

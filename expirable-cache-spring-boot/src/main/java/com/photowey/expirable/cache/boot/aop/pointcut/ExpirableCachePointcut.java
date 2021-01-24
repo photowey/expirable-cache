@@ -61,6 +61,8 @@ public class ExpirableCachePointcut implements Pointcut, MethodMatcher {
             ExpirableCache annotation = AnnotationUtils.getAnnotation(specificMethod, ExpirableCache.class);
             CacheDefinition cacheDefinition = this.populateCacheDefinition(specificMethod, annotation);
             CacheDefinitionHolder.putCacheDefinition(methodClassKey, cacheDefinition);
+
+            return true;
         }
 
         return false;

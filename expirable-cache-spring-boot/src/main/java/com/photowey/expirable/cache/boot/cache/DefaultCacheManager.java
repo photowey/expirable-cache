@@ -16,11 +16,14 @@
 
 package com.photowey.expirable.cache.boot.cache;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,7 +35,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2021/01/23
  * @since 1.0.0
  */
-public class DefaultCacheManager implements CacheManager, InitializingBean, BeanFactoryAware {
+public class DefaultCacheManager implements CacheManager, InitializingBean, BeanFactoryAware, BeanPostProcessor {
+
+    private static final Logger log = LoggerFactory.getLogger(DefaultCacheManager.class);
 
     private ListableBeanFactory beanFactory;
 
@@ -56,6 +61,12 @@ public class DefaultCacheManager implements CacheManager, InitializingBean, Bean
     @Override
     public void afterPropertiesSet() throws Exception {
         Map<String, Cache> beans = this.beanFactory.getBeansOfType(Cache.class);
-        beans.forEach((k, v) -> cacheHolder.put(k, v));
+        beans.forEach((k, v) -> this.cacheHolder.put(v.getCacheName(), v));
+    }
+
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+
+        return bean;
     }
 }

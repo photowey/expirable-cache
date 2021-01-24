@@ -17,11 +17,14 @@
 package com.photowey.expirable.cache.boot.parser.impl;
 
 import com.photowey.expirable.cache.boot.parser.IExpressionParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.lang.Nullable;
+import org.springframework.util.ObjectUtils;
 
 /**
  * {@code ExpressionParserImpl}
@@ -31,6 +34,8 @@ import org.springframework.lang.Nullable;
  * @since 1.0.0
  */
 public class ExpressionParserImpl implements IExpressionParser {
+
+    private static final Logger log = LoggerFactory.getLogger(ExpressionParserImpl.class);
 
     private final ExpressionParser expressionParser;
 
@@ -42,15 +47,19 @@ public class ExpressionParserImpl implements IExpressionParser {
     @Override
     public String parseExpression(String candidate, String[] keys, Object[] values) {
         this.verifyNull(keys, values);
-        if (values.length == 0) {
+        if (ObjectUtils.isEmpty(values)) {
             return null;
         }
         EvaluationContext context = new StandardEvaluationContext();
         for (int i = 0; i < values.length; i++) {
             context.setVariable(keys[i], values[i]);
         }
+        String parseResult = this.parse(candidate, context);
+        if (log.isInfoEnabled()) {
+            log.info("parse the cache-key:[{}], result is:[{}]", candidate, parseResult);
+        }
 
-        return this.parse(candidate, context);
+        return parseResult;
     }
 
     @Nullable

@@ -79,7 +79,7 @@ public class ExpirableCacheAdvice implements MethodInterceptor, BeanFactoryAware
         Object targetCache = this.getCache(cacheKey, cacheDefinition);
         if (!ObjectUtils.isEmpty(targetCache)) {
             if (log.isInfoEnabled()) {
-                log.info("hits:[{}] the cacheValue in cache", target.getName());
+                log.info("hits:[{}] method cache-key:[{}] in cache", this.populateMethodName(target), cacheKey);
             }
             if (annotation.handleType()) {
                 return this.handleTypeConvert(target, targetCache);
@@ -96,7 +96,7 @@ public class ExpirableCacheAdvice implements MethodInterceptor, BeanFactoryAware
             targetCache = this.getCache(cacheKey, cacheDefinition);
             if (!ObjectUtils.isEmpty(targetCache)) {
                 if (log.isInfoEnabled()) {
-                    log.info("hits:[{}] the cache-value in cache", target.getName());
+                    log.info("read the cache again, hits:[{}] method cache-key:[{}] in cache", this.populateMethodName(target), cacheKey);
                 }
                 if (annotation.handleType()) {
                     return this.handleTypeConvert(target, targetCache);
@@ -107,7 +107,7 @@ public class ExpirableCacheAdvice implements MethodInterceptor, BeanFactoryAware
             Object invocationResult = methodInvocation.proceed();
             if (!ObjectUtils.isEmpty(invocationResult)) {
                 if (log.isInfoEnabled()) {
-                    log.info("easyCache : query from db!");
+                    log.info("expirable-cache: not fount in the cache, and execution query from db!");
                 }
                 this.putCache(cacheDefinition, cacheKey, invocationResult);
 
@@ -120,6 +120,10 @@ public class ExpirableCacheAdvice implements MethodInterceptor, BeanFactoryAware
         }
 
         return null;
+    }
+
+    private String populateMethodName(Method target) {
+        return (target.getDeclaringClass().getName() + "#" + target.getName());
     }
 
     private void throwException(Method target, ExpirableCache annotation, String cacheKey) {
@@ -154,10 +158,13 @@ public class ExpirableCacheAdvice implements MethodInterceptor, BeanFactoryAware
         }
 
         for (String cacheName : cacheNames) {
+            // May be NullPointerException.
             Cache defaultCacheCandidate = cacheManager.getCache(cacheName);
-            Object targetCache = defaultCacheCandidate.get(cacheKey);
-            if (!ObjectUtils.isEmpty(targetCache)) {
-                return targetCache;
+            if (!ObjectUtils.isEmpty(defaultCacheCandidate)) {
+                Object targetCache = defaultCacheCandidate.get(cacheKey);
+                if (!ObjectUtils.isEmpty(targetCache)) {
+                    return targetCache;
+                }
             }
         }
 

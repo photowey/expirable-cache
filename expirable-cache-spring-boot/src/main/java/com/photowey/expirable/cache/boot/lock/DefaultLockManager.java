@@ -16,11 +16,14 @@
 
 package com.photowey.expirable.cache.boot.lock;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,7 +35,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2021/01/23
  * @since 1.0.0
  */
-public class DefaultLockManager implements LockManager, InitializingBean, BeanFactoryAware {
+public class DefaultLockManager implements LockManager, InitializingBean, BeanFactoryAware, BeanPostProcessor {
+
+    private static final Logger log = LoggerFactory.getLogger(DefaultLockManager.class);
 
     private ListableBeanFactory beanFactory;
 
@@ -56,6 +61,12 @@ public class DefaultLockManager implements LockManager, InitializingBean, BeanFa
     @Override
     public void afterPropertiesSet() throws Exception {
         Map<String, Lock> beans = this.beanFactory.getBeansOfType(Lock.class);
-        beans.forEach((k, v) -> lockHolder.put(k, v));
+        beans.forEach((k, v) -> this.lockHolder.put(v.getLockName(), v));
+    }
+
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+
+        return bean;
     }
 }

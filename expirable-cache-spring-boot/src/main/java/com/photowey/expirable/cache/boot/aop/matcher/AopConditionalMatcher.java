@@ -16,6 +16,7 @@
 
 package com.photowey.expirable.cache.boot.aop.matcher;
 
+import com.photowey.expirable.cache.boot.util.CollectionUtils;
 import org.springframework.aop.framework.autoproxy.AbstractAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.annotation.Condition;
@@ -35,7 +36,7 @@ public class AopConditionalMatcher implements Condition {
     public boolean matches(ConditionContext conditionContext, AnnotatedTypeMetadata annotatedTypeMetadata) {
         ConfigurableListableBeanFactory beanFactory = conditionContext.getBeanFactory();
         String[] beanNames = beanFactory.getBeanNamesForType(AbstractAdvisorAutoProxyCreator.class);
-        if (null != beanNames && beanNames.length > 0) {
+        if (CollectionUtils.isEmpty(beanNames)) {
             return true;
         }
 

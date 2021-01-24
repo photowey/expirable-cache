@@ -34,9 +34,9 @@ public class ExpirableCacheProperties {
     private Local local = new Local();
 
     public static class Redis {
-        private String host = "localhost";
-        private String password = "";
-        private int port = 6379;
+        private String host;
+        private String password;
+        private Integer port;
         private int maxTotal = 1024;
         private int maxIdle = 16;
         // default 3_000
@@ -60,11 +60,11 @@ public class ExpirableCacheProperties {
             this.password = password;
         }
 
-        public int getPort() {
+        public Integer getPort() {
             return port;
         }
 
-        public void setPort(int port) {
+        public void setPort(Integer port) {
             this.port = port;
         }
 
