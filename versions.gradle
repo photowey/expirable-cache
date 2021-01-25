@@ -19,4 +19,8 @@ ext {
 
     REDISSON_VERSION = "3.14.1"
     CAFFEINE_VERSION = "2.8.8"
+
+    ZOOKEEER_VERSION = "3.5.8"
+    CURATOR_VERSION = "4.0.0"
+    LOG4J_VERSION = "1.2.17"
 }

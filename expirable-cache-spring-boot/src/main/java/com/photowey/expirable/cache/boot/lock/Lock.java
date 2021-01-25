@@ -29,7 +29,7 @@ public interface Lock {
 
     String getLockName();
 
-    void lock(String key, long releaseMillis, TimeUnit timeUnit);
+    void lock(String key, long releaseMillis, TimeUnit timeUnit) throws Exception;
 
-    void unlock();
+    void unlock() throws Exception;
 }

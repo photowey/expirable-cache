@@ -91,7 +91,7 @@ public class ExpirableCachePointcut implements Pointcut, MethodMatcher {
 
     private CacheDefinition populateCacheDefinition(Method specificMethod, ExpirableCache annotation) {
         CacheDefinition cacheDefinition = new CacheDefinition();
-        cacheDefinition.setCacheNames(Objects.requireNonNull(annotation).name());
+        cacheDefinition.setCacheNames(Objects.requireNonNull(annotation).cacheCandidate());
         cacheDefinition.setCacheKey(annotation.key());
         cacheDefinition.setExpire(annotation.expire());
         cacheDefinition.setTimeUnit(annotation.timeUnit());
@@ -105,7 +105,7 @@ public class ExpirableCachePointcut implements Pointcut, MethodMatcher {
 
     private LockDefinition populateLockDefinition(CacheLock lock) {
         LockDefinition lockDefinition = new LockDefinition();
-        lockDefinition.setLockName(lock.lockName());
+        lockDefinition.setLockName(lock.lockCandidate());
         lockDefinition.setExpire(lock.expire());
         lockDefinition.setTimeUnit(lock.timeUnit());
         String lockKey = lock.key();

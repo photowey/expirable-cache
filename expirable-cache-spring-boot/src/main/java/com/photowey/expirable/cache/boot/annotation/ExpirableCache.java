@@ -16,8 +16,6 @@
 
 package com.photowey.expirable.cache.boot.annotation;
 
-import org.springframework.core.annotation.AliasFor;
-
 import java.lang.annotation.*;
 import java.util.concurrent.TimeUnit;
 
@@ -36,13 +34,6 @@ public @interface ExpirableCache {
 
     String key() default "";
 
-    @AliasFor("name")
-    String[] value() default {};
-
-    @AliasFor("value")
-    String[] name() default {};
-
-    @AliasFor("name")
     String[] cacheCandidate() default {};
 
     long expire() default 60L;

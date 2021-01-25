@@ -18,6 +18,7 @@ package com.photowey.expirable.cache.autoconfigurer.config;
 
 import com.photowey.expirable.cache.autoconfigurer.config.local.ExpirableCacheLocalAutoConfiguration;
 import com.photowey.expirable.cache.autoconfigurer.config.redis.ExpirableCacheRedisAutoConfiguration;
+import com.photowey.expirable.cache.autoconfigurer.config.zookeeper.ExpirableCacheZookeeperAutoConfiguration;
 import com.photowey.expirable.cache.autoconfigurer.selector.ExpirableCacheAutoConfigurerImportSelector;
 import com.photowey.expirable.cache.boot.cache.CacheManager;
 import com.photowey.expirable.cache.boot.cache.DefaultCacheManager;
@@ -40,6 +41,7 @@ import org.springframework.context.annotation.Import;
         ExpirableCacheAutoConfigurerImportSelector.class,
         ExpirableCacheAopAutoConfiguration.class,
         ExpirableCacheRedisAutoConfiguration.class,
+        ExpirableCacheZookeeperAutoConfiguration.class,
         ExpirableCacheLocalAutoConfiguration.class
 })
 public class ExpirableCacheAutoConfiguration {

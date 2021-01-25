@@ -30,8 +30,66 @@ import java.util.concurrent.TimeUnit;
 @ConfigurationProperties(prefix = "expirable.cache")
 public class ExpirableCacheProperties {
 
-    private Redis redis = new Redis();
     private Local local = new Local();
+    private Redis redis = new Redis();
+    private Zookeeper zookeeper = new Zookeeper();
+
+    public static class Zookeeper {
+        private String lockPath = "/lock/expirable/cache";
+        private String connectString = "127.0.0.1:2181";
+        private int baseSleepTimeMs = 1_000;
+        private int maxRetries = 3;
+        private int sessionTimeoutMs = 60_000;
+        private int connectionTimeoutMs = 30_000;
+
+        public String getLockPath() {
+            return lockPath;
+        }
+
+        public void setLockPath(String lockPath) {
+            this.lockPath = lockPath;
+        }
+
+        public String getConnectString() {
+            return connectString;
+        }
+
+        public void setConnectString(String connectString) {
+            this.connectString = connectString;
+        }
+
+        public int getBaseSleepTimeMs() {
+            return baseSleepTimeMs;
+        }
+
+        public void setBaseSleepTimeMs(int baseSleepTimeMs) {
+            this.baseSleepTimeMs = baseSleepTimeMs;
+        }
+
+        public int getMaxRetries() {
+            return maxRetries;
+        }
+
+        public void setMaxRetries(int maxRetries) {
+            this.maxRetries = maxRetries;
+        }
+
+        public int getSessionTimeoutMs() {
+            return sessionTimeoutMs;
+        }
+
+        public void setSessionTimeoutMs(int sessionTimeoutMs) {
+            this.sessionTimeoutMs = sessionTimeoutMs;
+        }
+
+        public int getConnectionTimeoutMs() {
+            return connectionTimeoutMs;
+        }
+
+        public void setConnectionTimeoutMs(int connectionTimeoutMs) {
+            this.connectionTimeoutMs = connectionTimeoutMs;
+        }
+    }
 
     public static class Redis {
         private String host;
@@ -161,6 +219,14 @@ public class ExpirableCacheProperties {
         }
     }
 
+    public Local getLocal() {
+        return local;
+    }
+
+    public void setLocal(Local local) {
+        this.local = local;
+    }
+
     public Redis getRedis() {
         return redis;
     }
@@ -169,11 +235,11 @@ public class ExpirableCacheProperties {
         this.redis = redis;
     }
 
-    public Local getLocal() {
-        return local;
+    public Zookeeper getZookeeper() {
+        return zookeeper;
     }
 
-    public void setLocal(Local local) {
-        this.local = local;
+    public void setZookeeper(Zookeeper zookeeper) {
+        this.zookeeper = zookeeper;
     }
 }

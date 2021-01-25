@@ -22,4 +22,9 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-data-redis'
     compile "org.redisson:redisson-spring-boot-starter:${REDISSON_VERSION}"
     compile "com.github.ben-manes.caffeine:caffeine:${CAFFEINE_VERSION}"
+
+    // Scope provided.
+    implementation "org.apache.zookeeper:zookeeper:${ZOOKEEER_VERSION}"
+    implementation "org.apache.curator:curator-recipes:${CURATOR_VERSION}"
+    implementation("log4j:log4j:${LOG4J_VERSION}")
 }

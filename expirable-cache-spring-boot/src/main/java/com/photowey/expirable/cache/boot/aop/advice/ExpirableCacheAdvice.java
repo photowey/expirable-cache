@@ -114,6 +114,8 @@ public class ExpirableCacheAdvice implements MethodInterceptor, BeanFactoryAware
                 return invocationResult;
             }
         } catch (Exception e) {
+            // FIXME use com.photowey.expirable.cache.boot.lock.zookeeper.ZookeeperLock:
+            //  java.lang.IllegalMonitorStateException: You do not own the lock: /lock/expirable/cache/xxx
             log.error("handle the method:[{}] cache-value exception", target.getName());
         } finally {
             lock.unlock();

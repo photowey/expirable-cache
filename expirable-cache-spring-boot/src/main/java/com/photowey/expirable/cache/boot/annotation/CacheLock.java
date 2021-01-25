@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CacheLock {
 
-    String lockName() default "redis";
+    String lockCandidate() default "redis";
 
     long expire() default 60L;
 

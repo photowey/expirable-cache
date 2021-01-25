@@ -49,14 +49,14 @@ public class RedisLock implements Lock, InitializingBean, BeanFactoryAware {
     private RLock lock;
 
     @Override
-    public void lock(String key, long releaseMillis, TimeUnit timeUnit) {
+    public void lock(String key, long releaseMillis, TimeUnit timeUnit) throws Exception {
         RedissonClient redissonClient = this.beanFactory.getBean(RedissonClient.class);
         lock = redissonClient.getLock(key);
         lock.lock();
     }
 
     @Override
-    public void unlock() {
+    public void unlock() throws Exception {
         lock.unlock();
     }
 

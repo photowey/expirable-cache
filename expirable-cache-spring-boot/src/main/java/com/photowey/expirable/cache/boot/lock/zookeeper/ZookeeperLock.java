@@ -17,11 +17,12 @@
 package com.photowey.expirable.cache.boot.lock.zookeeper;
 
 import com.photowey.expirable.cache.boot.lock.Lock;
+import com.photowey.expirable.cache.boot.properties.ExpirableCacheProperties;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.locks.InterProcessLock;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.*;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
@@ -35,12 +36,22 @@ import java.util.concurrent.TimeUnit;
  * @date 2021/01/23
  * @since 1.0.0
  */
-public class ZookeeperLock implements Lock, InitializingBean, EnvironmentAware, BeanFactoryAware {
+public class ZookeeperLock implements Lock, InitializingBean, EnvironmentAware, BeanFactoryAware, DisposableBean {
 
     private static final String ZOOKEEPER_LOCK_NAME = "zookeeper";
+    private static final String PATH_TEMPLATE = "%s/%s";
 
     private ConfigurableEnvironment environment;
     private ListableBeanFactory beanFactory;
+
+    private CuratorFramework curatorFramework;
+
+    private InterProcessLock lock;
+    private String key;
+
+    public ZookeeperLock(CuratorFramework curatorFramework) {
+        this.curatorFramework = curatorFramework;
+    }
 
     @Override
     public String getLockName() {
@@ -48,13 +59,24 @@ public class ZookeeperLock implements Lock, InitializingBean, EnvironmentAware, 
     }
 
     @Override
-    public void lock(String key, long releaseMillis, TimeUnit timeUnit) {
+    public void lock(String key, long releaseMillis, TimeUnit timeUnit) throws Exception {
+        // FIXME
+        ExpirableCacheProperties expirableCacheProperties = this.beanFactory.getBean(ExpirableCacheProperties.class);
+        ExpirableCacheProperties.Zookeeper zookeeper = expirableCacheProperties.getZookeeper();
+        lock = new InterProcessMutex(this.curatorFramework, String.format(PATH_TEMPLATE, zookeeper.getLockPath(), key));
+        if (releaseMillis > 0) {
+            lock.acquire(releaseMillis, timeUnit);
+        } else {
+            lock.acquire();
+        }
 
+        this.key = key;
     }
 
     @Override
-    public void unlock() {
-
+    public void unlock() throws Exception {
+        // FIXME
+        lock.release();
     }
 
     @Override
@@ -64,7 +86,17 @@ public class ZookeeperLock implements Lock, InitializingBean, EnvironmentAware, 
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        // TODO
+        ExpirableCacheProperties expirableCacheProperties = this.beanFactory.getBean(ExpirableCacheProperties.class);
+        ExpirableCacheProperties.Zookeeper zookeeper = expirableCacheProperties.getZookeeper();
+        String lockPath = zookeeper.getLockPath();
+        if (!lockPath.startsWith("/")) {
+            throw new IllegalArgumentException(String.format("Set the correct Zookeeper lock path:[%s], please!", lockPath));
+        }
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        this.curatorFramework.close();
     }
 
     @Override

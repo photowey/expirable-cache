@@ -16,8 +16,6 @@
 
 package com.photowey.expirable.cache.boot.lock;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -37,11 +35,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DefaultLockManager implements LockManager, InitializingBean, BeanFactoryAware, BeanPostProcessor {
 
-    private static final Logger log = LoggerFactory.getLogger(DefaultLockManager.class);
-
     private ListableBeanFactory beanFactory;
 
-    private ConcurrentHashMap<String, Lock> lockHolder = new ConcurrentHashMap<>(5);
+    private ConcurrentHashMap<String, Lock> lockHolder = new ConcurrentHashMap<>(3);
 
     @Override
     public Lock getLock(String lockName) {
@@ -61,7 +57,7 @@ public class DefaultLockManager implements LockManager, InitializingBean, BeanFa
     @Override
     public void afterPropertiesSet() throws Exception {
         Map<String, Lock> beans = this.beanFactory.getBeansOfType(Lock.class);
-        beans.forEach((k, v) -> this.lockHolder.put(v.getLockName(), v));
+        beans.forEach((k, v) -> this.putLock(v.getLockName(), v));
     }
 
     @Override

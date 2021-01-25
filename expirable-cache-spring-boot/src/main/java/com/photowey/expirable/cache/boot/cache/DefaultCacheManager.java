@@ -61,7 +61,7 @@ public class DefaultCacheManager implements CacheManager, InitializingBean, Bean
     @Override
     public void afterPropertiesSet() throws Exception {
         Map<String, Cache> beans = this.beanFactory.getBeansOfType(Cache.class);
-        beans.forEach((k, v) -> this.cacheHolder.put(v.getCacheName(), v));
+        beans.forEach((k, v) -> this.putCache(v.getCacheName(), v));
     }
 
     @Override
