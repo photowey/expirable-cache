@@ -39,15 +39,13 @@ import java.util.concurrent.TimeUnit;
 public class ZookeeperLock implements Lock, InitializingBean, EnvironmentAware, BeanFactoryAware, DisposableBean {
 
     private static final String ZOOKEEPER_LOCK_NAME = "zookeeper";
-    private static final String PATH_TEMPLATE = "%s/%s";
 
     private ConfigurableEnvironment environment;
     private ListableBeanFactory beanFactory;
 
-    private CuratorFramework curatorFramework;
+    private final CuratorFramework curatorFramework;
 
     private InterProcessLock lock;
-    private String key;
 
     public ZookeeperLock(CuratorFramework curatorFramework) {
         this.curatorFramework = curatorFramework;
@@ -63,14 +61,12 @@ public class ZookeeperLock implements Lock, InitializingBean, EnvironmentAware, 
         // FIXME
         ExpirableCacheProperties expirableCacheProperties = this.beanFactory.getBean(ExpirableCacheProperties.class);
         ExpirableCacheProperties.Zookeeper zookeeper = expirableCacheProperties.getZookeeper();
-        lock = new InterProcessMutex(this.curatorFramework, String.format(PATH_TEMPLATE, zookeeper.getLockPath(), key));
+        lock = new InterProcessMutex(this.curatorFramework, zookeeper.getLockPath());
         if (releaseMillis > 0) {
             lock.acquire(releaseMillis, timeUnit);
         } else {
             lock.acquire();
         }
-
-        this.key = key;
     }
 
     @Override
@@ -86,12 +82,7 @@ public class ZookeeperLock implements Lock, InitializingBean, EnvironmentAware, 
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        ExpirableCacheProperties expirableCacheProperties = this.beanFactory.getBean(ExpirableCacheProperties.class);
-        ExpirableCacheProperties.Zookeeper zookeeper = expirableCacheProperties.getZookeeper();
-        String lockPath = zookeeper.getLockPath();
-        if (!lockPath.startsWith("/")) {
-            throw new IllegalArgumentException(String.format("Set the correct Zookeeper lock path:[%s], please!", lockPath));
-        }
+
     }
 
     @Override

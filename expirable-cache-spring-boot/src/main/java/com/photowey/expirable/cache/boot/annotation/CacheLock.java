@@ -34,7 +34,7 @@ public @interface CacheLock {
 
     String lockCandidate() default "redis";
 
-    long expire() default 60L;
+    long expire() default 5L;
 
     TimeUnit timeUnit() default TimeUnit.SECONDS;
 

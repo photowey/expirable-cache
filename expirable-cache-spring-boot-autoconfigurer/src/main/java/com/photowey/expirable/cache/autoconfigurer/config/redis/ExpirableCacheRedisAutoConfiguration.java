@@ -30,11 +30,9 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -53,8 +51,6 @@ import org.springframework.util.ObjectUtils;
  */
 @Configuration
 @ConditionalOnClass(RedisConnectionFactory.class)
-@EnableConfigurationProperties({ExpirableCacheProperties.class})
-@AutoConfigureAfter(org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration.class)
 public class ExpirableCacheRedisAutoConfiguration implements BeanFactoryAware, InitializingBean {
 
     private BeanFactory beanFactory;
@@ -72,37 +68,6 @@ public class ExpirableCacheRedisAutoConfiguration implements BeanFactoryAware, I
         redis.setHost(ObjectUtils.isEmpty(redis.getHost()) ? redisProperties.getHost() : redis.getHost());
         redis.setPort(ObjectUtils.isEmpty(redis.getPort()) ? redisProperties.getPort() : redis.getPort());
         redis.setPassword(ObjectUtils.isEmpty(redis.getPassword()) ? redisProperties.getPassword() : redis.getPassword());
-    }
-
-    /**
-     * {@link RedisCacheService}
-     *
-     * @return {@link RedisCacheService}
-     */
-    @Bean
-    public RedisCacheService redisCacheService() {
-        return new RedisCacheServiceImpl();
-    }
-
-    /**
-     * Default cache.
-     *
-     * @return {@link RedisCache}
-     */
-    @Bean
-    public RedisCache redisCache() {
-        RedisCache redisCache = new RedisCache(this.redisCacheService());
-        return redisCache;
-    }
-
-    /**
-     * Default lock.
-     *
-     * @return {@link RedisLock}
-     */
-    @Bean
-    public RedisLock redisLock() {
-        return new RedisLock();
     }
 
     /**
@@ -140,12 +105,43 @@ public class ExpirableCacheRedisAutoConfiguration implements BeanFactoryAware, I
         return new GenericJackson2JsonRedisSerializer();
     }
 
-    @Bean(ExpirableCacheConstants.REDIS_TEMPLATE_BEAN_ID)
     @ConditionalOnMissingBean
+    @Bean(ExpirableCacheConstants.REDIS_TEMPLATE_BEAN_ID)
     public RedisTemplate<String, Object> expirableCacheRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, Object> redisPromTemplate = new RedisTemplate<>();
-        this.initDomainRedisTemplate(redisPromTemplate, redisConnectionFactory);
-        return redisPromTemplate;
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        this.initDomainRedisTemplate(redisTemplate, redisConnectionFactory);
+        return redisTemplate;
+    }
+
+    /**
+     * {@link RedisCacheService}
+     *
+     * @return {@link RedisCacheService}
+     */
+    @Bean
+    public RedisCacheService redisCacheService() {
+        return new RedisCacheServiceImpl();
+    }
+
+    /**
+     * Default cache.
+     *
+     * @return {@link RedisCache}
+     */
+    @Bean
+    public RedisCache redisCache() {
+        RedisCache redisCache = new RedisCache(this.redisCacheService());
+        return redisCache;
+    }
+
+    /**
+     * Default lock.
+     *
+     * @return {@link RedisLock}
+     */
+    @Bean
+    public RedisLock redisLock() {
+        return new RedisLock();
     }
 
     private void initDomainRedisTemplate(RedisTemplate<String, Object> redisTemplate, RedisConnectionFactory redisConnectionFactory) {

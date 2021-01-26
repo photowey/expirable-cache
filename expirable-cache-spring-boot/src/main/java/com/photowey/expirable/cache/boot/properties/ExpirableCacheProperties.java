@@ -27,8 +27,10 @@ import java.util.concurrent.TimeUnit;
  * @date 2021/01/23
  * @since 1.0.0
  */
-@ConfigurationProperties(prefix = "expirable.cache")
+@ConfigurationProperties(prefix = ExpirableCacheProperties.EXPIRABLE_CACHE_PREFIX)
 public class ExpirableCacheProperties {
+
+    public static final String EXPIRABLE_CACHE_PREFIX = "expirable.cache";
 
     private Local local = new Local();
     private Redis redis = new Redis();

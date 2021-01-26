@@ -16,7 +16,7 @@
 
 package com.photowey.expirable.cache.autoconfigurer.annotation;
 
-import com.photowey.expirable.cache.autoconfigurer.selector.ExpirableCacheAutoConfigurerImportSelector;
+import com.photowey.expirable.cache.autoconfigurer.config.ExpirableCacheAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
 import org.springframework.context.annotation.Import;
 
@@ -34,6 +34,6 @@ import java.lang.annotation.*;
 @AutoConfigurationPackage
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Import(value = {ExpirableCacheAutoConfigurerImportSelector.class})
+@Import(value = {ExpirableCacheAutoConfiguration.class})
 public @interface EnableExpirableCache {
 }

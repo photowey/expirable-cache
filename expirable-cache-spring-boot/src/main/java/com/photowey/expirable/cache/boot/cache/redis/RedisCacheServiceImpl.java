@@ -59,7 +59,11 @@ public class RedisCacheServiceImpl implements RedisCacheService {
 
     @Override
     public <K, V> void put(K key, V value, long expire, TimeUnit timeUnit) {
-        this.redisTemplate.opsForValue().set(this.populateCacheKey(key), value, expire, timeUnit);
+        if (expire < 0) {
+            this.put(key, value);
+        } else {
+            this.redisTemplate.opsForValue().set(this.populateCacheKey(key), value, expire, timeUnit);
+        }
     }
 
     @Override

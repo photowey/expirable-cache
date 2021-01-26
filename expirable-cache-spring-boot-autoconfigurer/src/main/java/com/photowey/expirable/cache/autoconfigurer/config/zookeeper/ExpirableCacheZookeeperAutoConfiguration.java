@@ -26,11 +26,12 @@ import org.apache.zookeeper.Watcher;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.ObjectUtils;
 
 /**
  * {@code ExpirableCacheZookeeperAutoConfiguration}
@@ -41,13 +42,26 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnClass(value = {CuratorFramework.class, Watcher.class})
-public class ExpirableCacheZookeeperAutoConfiguration implements BeanFactoryAware {
+public class ExpirableCacheZookeeperAutoConfiguration implements BeanFactoryAware, InitializingBean {
 
-    private ListableBeanFactory beanFactory;
+    private BeanFactory beanFactory;
 
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-        this.beanFactory = (ListableBeanFactory) beanFactory;
+        this.beanFactory = beanFactory;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        ExpirableCacheProperties expirableCacheProperties = this.beanFactory.getBean(ExpirableCacheProperties.class);
+        ExpirableCacheProperties.Zookeeper zookeeper = expirableCacheProperties.getZookeeper();
+        String lockPath = zookeeper.getLockPath();
+        if (!lockPath.startsWith("/")) {
+            throw new IllegalArgumentException(String.format("Set the correct Zookeeper lock path:[%s], please!", lockPath));
+        }
+        if (ObjectUtils.isEmpty(zookeeper.getConnectString())) {
+            throw new IllegalArgumentException("Set the correct Zookeeper connect-string, please!");
+        }
     }
 
     @Bean

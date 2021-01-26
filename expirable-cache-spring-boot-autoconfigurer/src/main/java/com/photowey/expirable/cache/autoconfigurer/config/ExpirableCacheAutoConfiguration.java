@@ -38,11 +38,12 @@ import org.springframework.context.annotation.Import;
  */
 @Configuration
 @Import(value = {
+        CommonConfigurer.class,
         ExpirableCacheAutoConfigurerImportSelector.class,
-        ExpirableCacheAopAutoConfiguration.class,
         ExpirableCacheRedisAutoConfiguration.class,
+        ExpirableCacheLocalAutoConfiguration.class,
         ExpirableCacheZookeeperAutoConfiguration.class,
-        ExpirableCacheLocalAutoConfiguration.class
+        ExpirableCacheAopAutoConfiguration.class
 })
 public class ExpirableCacheAutoConfiguration {
 
