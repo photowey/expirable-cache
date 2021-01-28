@@ -26,6 +26,7 @@ $ git clone https://github.com/photowey/expirable-cache.git
 
 $ ./gradlew publishToMavenLocal
 $ ./gradlew packageSources
+## upload to nexus, if necessary
 $ ./gradlew uploadArchives
 ```
 
